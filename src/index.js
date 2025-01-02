@@ -18,9 +18,9 @@ const Bin = () => {
   </>);
 }
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <Bin />
-  </React.StrictMode>
+  // </React.StrictMode>
 );
 
 // reportWebVitals();

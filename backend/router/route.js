@@ -4,17 +4,11 @@ import bcrypt from"bcrypt"
 import jwt from "jsonwebtoken";
 import middle from "../middle.js";
 import { message } from "../controllers/message.js";
+import { io } from "../index.js"
 
 const router=express.Router();
 
 const secretKey="Tarnvir";
-
-// under
-import { Server } from 'socket.io';
-import{createServer} from "http";
-const app = express();
-const server = createServer(app);
-const io = new Server(server);
 
 
 router.post('/sith', async (req, res) => {
@@ -57,7 +51,7 @@ router.post('/log', async (req, res) => {
         }
 
         const payload={userId:user._id};
-        const token = jwt.sign(payload, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign(payload, secretKey);
         res.status(200).send({token});
 
     } catch (error) {
@@ -74,7 +68,7 @@ router.post('/message',middle,async(req,res)=>{
             return res.status(400).send("send something");
         }
         const newMessage=await message.create({link:userr.userId,mess});
-        io.emit('newMessage', newMessage);//here i doubt
+        io.emit('newMessage', newMessage);
         res.status(200).send("success");
         
     } catch (error) {
@@ -84,22 +78,24 @@ router.post('/message',middle,async(req,res)=>{
 });
 
 router.get("/allmessage",async(req,res)=>{
-    try {
-        const a=await message.find();
-
-        io.on('connection', async (socket) => { // Listen for a connection event
-            console.log('a user connected');
-            
-            // Send all messages to the new client when they connect
-            const messages = await message.find();
-            socket.emit('allMessages', messages); // Emit all messages to the client using 'allMessages' event
+    try {     
+        const a= await message.find();
+        res.send(a);
         
-            // Handle disconnection
-            socket.on('disconnect', () => {
-                console.log('user disconnected');
-            });
-        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("An error occurred while processing your request.");
+    }
+})
 
+router.get("/findName/:id",async(req,res)=>{   
+    try {   
+        const { id } = req.params; 
+        console.log(id);
+        if (!id) {
+            return res.status(400).send({message:"Link parameter is required."});
+        } 
+        const a= await authenti.findById(id);
         res.send(a);
         
     } catch (error) {

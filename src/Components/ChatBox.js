@@ -12,28 +12,30 @@ export default function ChatBox() {
 
     const socket = io('http://localhost:5000'); 
 
-    console.log(token);
+
+    useEffect(() => { // it initially run and run again on every socket change
+      socket.on('newMessage',(newMessage)=>{
+        setmessages((prv)=>[...prv,newMessage])
+      })
+  
+      return () => {
+        socket.disconnect();
+      };
+    }, [socket]);
 
     useEffect(() => {
-        const fetchdata=async()=>{
-            await axios.get('http://localhost:5000/api/use/allmessage')
-          .then((response) => {
-            setmessages(response.data);  
-          })
-          .catch((err) => {
-            console.log(err.message);
-          });
-        }
-        fetchdata();
-
-        socket.on('newMessage', (newMessage) => {
-            setmessag(prevMessages => [...prevMessages, newMessage]); // Add the new message to the messages state
+      const fetchdata=async()=>{
+          await axios.get('http://localhost:5000/api/use/allmessage')
+        .then((response) => {
+          setmessages(response.data);  
+        })
+        .catch((err) => {
+          console.log(err.message);
         });
+      }
+      fetchdata();
+  }, []);
 
-        return () => {
-            socket.off('newMessage'); // Clean up the socket listener when the component unmounts
-        };
-    }, []);
 
       if(!authenticate){
         return <Navigate to='/'/>
@@ -62,23 +64,75 @@ export default function ChatBox() {
                   })
                   .catch((err) => {
                     console.log(err.message);
-                  });
-                  socket.emit('sendMessage', { mess: messag });
-        
-                    setmessag(""); 
-                
+                  });  
+                  setmessag("");
             } catch (error) {
                 console.log(error);
             }
         }
+
+        // useEffect(() => {
+        //   const fetchNames = async () => {
+        //     const nameMap = {};
+        //         try {
+        //           const response = await axios.get(`http://localhost:5000/api/use/findName/${element.link}`);
+        //           nameMap[element.link] = response?.data?.name || '';
+        //         } catch (error) {
+        //           console.error('Error fetching name:', error);
+        //         }
+        //     setname(nameMap); // Store all names in one go after fetching them
+        //   };
+      
+        //   if (messages.length > 0) { // Only fetch names if there are messages
+        //     fetchNames();
+        //   }
+        // }, [messages]);
+
+        // const getMessageStyle = (senderId) => {
+        //   if (senderId === userId) {
+        //     return {
+        //       display: "inline-block",
+        //       padding: "15px 30px", 
+        //       backgroundColor: "pink",  
+        //       color: "black", 
+        //       borderRadius: "60%",  
+        //       fontSize: "16px",  
+        //       textAlign: "center" , 
+        //       verticalAlign: "middle" ,
+        //       whiteSpace: "nowrap" 
+        //     };
+        //   } else {
+        //     return {
+        //       display: "inline-block",
+        //       padding: "15px 30px", 
+        //       backgroundColor: "rgb(185, 161, 118)",  
+        //       color: "black", 
+        //       borderRadius: "60%",  
+        //       fontSize: "16px",  
+        //       textAlign: "center" , 
+        //       verticalAlign: "middle" ,
+        //       whiteSpace: "nowrap" 
+        //     };
+        //   }
+        // }
+        
   return (
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingTop: "30vh"
+    }}>
     <div className="message-box">
     <div className="chat-window">
       {messages.map((element, index) => (
         <div
           key={index}
         >
-          {element.mess}
+          <p //style={getMessageStyle(element.link)}
+          >{element.mess}
+            {/* <small> {name[element.link]}</small>  */}
+          </p>
         </div>
       ))}
     </div>
@@ -87,6 +141,7 @@ export default function ChatBox() {
       <button onClick={handleSend}>Send</button>
       <div onClick={outplease}>Log Out</div>
     </div>
+  </div>
   </div>
   )
 }
