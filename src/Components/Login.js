@@ -5,7 +5,7 @@ import {context} from "../index.js"
 
 export default function Login() {
 
-    const {settoken,authenticate,setauthenticate}= useContext(context);
+    const {settoken,authenticate,setauthenticate,setuserid}= useContext(context);
 
     const [data, setdata]=useState({
         email:"",
@@ -26,6 +26,7 @@ export default function Login() {
           .then(response => {
             console.log('Response:', response.data.token);
             settoken(response.data.token);
+            setuserid(response.data.userId);
           })
           .catch(error => {
             console.error('Error posting data:', error);

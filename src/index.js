@@ -11,8 +11,9 @@ export const context = createContext();
 const Bin = () => {
   const [authenticate, setauthenticate] = useState(false);
   const [token, settoken] = useState("");
+  const [userid , setuserid]=useState("");
   return (<>
-    <context.Provider value={{ authenticate, setauthenticate, token, settoken }}>
+    <context.Provider value={{ authenticate, setauthenticate, token, settoken,userid , setuserid}}>
       <App />
     </context.Provider>
   </>);

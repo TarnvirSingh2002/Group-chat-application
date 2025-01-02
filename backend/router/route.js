@@ -52,7 +52,7 @@ router.post('/log', async (req, res) => {
 
         const payload={userId:user._id};
         const token = jwt.sign(payload, secretKey);
-        res.status(200).send({token});
+        res.status(200).send({token,userId:user._id});
 
     } catch (error) {
         console.log(error);
@@ -69,7 +69,7 @@ router.post('/message',middle,async(req,res)=>{
         }
         const newMessage=await message.create({link:userr.userId,mess});
         io.emit('newMessage', newMessage);
-        res.status(200).send("success");
+        res.status(200).send({message:"success",userid:userr.userId});
         
     } catch (error) {
         console.log(error);
@@ -91,7 +91,6 @@ router.get("/allmessage",async(req,res)=>{
 router.get("/findName/:id",async(req,res)=>{   
     try {   
         const { id } = req.params; 
-        console.log(id);
         if (!id) {
             return res.status(400).send({message:"Link parameter is required."});
         } 
@@ -105,5 +104,3 @@ router.get("/findName/:id",async(req,res)=>{
 })
 
 export default router
-
-
