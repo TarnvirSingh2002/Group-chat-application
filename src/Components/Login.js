@@ -24,14 +24,14 @@ export default function Login() {
             password: data.password
           })
           .then(response => {
-            console.log('Response:', response.data.token);
             settoken(response.data.token);
             setuserid(response.data.userId);
+            setauthenticate(true);
           })
           .catch(error => {
             console.error('Error posting data:', error);
           });
-        setauthenticate(true);
+        
     }
 
     if(authenticate){

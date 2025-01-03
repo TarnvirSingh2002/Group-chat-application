@@ -14,6 +14,8 @@ export default function ChatBox() {
 
   const messageEndRef = useRef(null);
 
+  const[photo,setphoto]=useState({});
+
 
   const socket = io('http://localhost:5000');
 
@@ -81,13 +83,12 @@ export default function ChatBox() {
             'Content-Type': 'application/json'
           }
         })
-        .then((response) => {
-          console.log(response);
+        .then(() => {
+          setmessag("");
         })
         .catch((err) => {
           console.log(err.message);
         });
-      setmessag("");
     } catch (error) {
       console.log(error);
     }
@@ -107,13 +108,14 @@ export default function ChatBox() {
           `http://localhost:5000/api/use/findName/${element.link}`
         );
         const ans = response?.data?.name || "";
+        const ph =  response?.data?.photo?.url;
         setNames((prev) => ({ ...prev, [element.link]: ans }));
+        setphoto((prev) => ({ ...prev, [element.link]: ph }));
       } catch (error) {
         console.error("Error fetching name:", error);
       }
     };
   
-
   const getsty = (id) => {
     if (id === userid) {
       return {
@@ -160,6 +162,7 @@ export default function ChatBox() {
               >{element.mess}
               </p>
               <span style={{color:"red",fontSize:"13px"}}>{names[element.link]}</span>
+              <img src={photo[element.link]} alt="" style={{borderRadius:"50%"}}height="30px"/>
             </div>
           ))}
           <div ref={messageEndRef} />

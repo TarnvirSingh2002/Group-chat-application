@@ -15,5 +15,9 @@ const user = new Schema({
         type: String,
         required: true
     },
+    photo:{
+        public_id:String,
+        url:String
+    }
 });
 export const authenti = mongoose.model("authenti", user);

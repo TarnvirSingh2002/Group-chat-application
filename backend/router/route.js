@@ -5,24 +5,38 @@ import jwt from "jsonwebtoken";
 import middle from "../middle.js";
 import { message } from "../controllers/message.js";
 import { io } from "../index.js"
-
+import cloudinary from "cloudinary";
 const router=express.Router();
 
 const secretKey="Tarnvir";
 
-
 router.post('/sith', async (req, res) => {
     try {
         const { name, email, password} = req.body;
+        const photo=req.files?.photo;
         if (!password || !email || !name){
             return res.status(400).send("Fill the full form!");
+        }
+        if (!photo){
+            return res.status(400).send("Avtar is not given!");
         }
         const use= await authenti.findOne({email});
         if(use){
             res.status(409).send("please log in");
         }
         const passkey=await bcrypt.hash(password,5);
-        await authenti.create({name, email, passcode:passkey});
+        
+        const cloudinaryResponse = await cloudinary.uploader.upload(photo.tempFilePath);//here i upload the image
+        if(!cloudinaryResponse || cloudinaryResponse.error){
+            console.error("Cloudinary error",cloudinaryResponse.error || "Unknown Cloudinary Error");
+          }
+        
+        await authenti.create({name, email, passcode:passkey,
+            photo: {
+                public_id: cloudinaryResponse.public_id,
+                url: cloudinaryResponse.secure_url,}
+        });
+
         res.status(200).send("Successfully registered");
 
     } catch (error) {
